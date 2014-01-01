@@ -37,9 +37,11 @@
  		$cfg->set_connections(array('development' =>
  		'mysql://root:P1zzaP4rty@localhost/15min?charset=utf8'));
  	});
- 	global $user;
+ 	global $app, $user;
 	$app = new \Slim\Slim();
 	$app->response->headers->set('Content-Type', 'application/json'); //default response type
+	$app->response->headers->set("Access-Control-Allow-Origin", "*"); // CORS
+
 
 	/**
 	* __________                   .__                       
@@ -49,8 +51,8 @@
  	* |____|_  /\___  >__   |____/|__||__|    \___  >____  >
 	*         \/     \/   |__|                     \/     \/ 	
 	*/
-	require_once('models/User.php');
 	require_once('House/Service/UserService.php');
+	require_once('House/Service/ProgramService.php');
 
 
 	/**
@@ -76,6 +78,9 @@
 			$response = $service->findByApiKey($request->get('api_key'));
 
 			if(!$response->isOk()){
+				
+				// @todo if request is not GET, and user does not have write access, then send 403 as well
+
 				$app->response->setStatus(403);
 				$app->stop();
 			} else {
@@ -87,18 +92,30 @@
 	$app->get('/hello/:name',  $authenticate($app), function ($name) {
 		global $user;
     	echo "Hello, $name";
+    	print_r($user);
 	});
 
 	/**
 	* Get all programs from now or timestamp
 	* 
-	* @param $unixtimestamp (optional) (default = now)
+	* @param $timestamp (optional) (default = now)
 	* @return array //collection of programs
 	*/
-	$app->get('/programs/',  $authenticate($app), function ($unixtimestamp = null) {
-		global $user;
-		
-    	//echo "Hello, $name";
+	$app->get('/programs/',  $authenticate($app), function ($timestamp = null) {
+		global $app;
+		$service = new ProgramService();
+		$criteria = array();
+		if(!is_null($timestamp)){
+			$criteria['timestamp'] = $timestamp;
+		}
+		$response = $service->find($criteria);
+
+    	if(!$response->isOk()){
+			$app->response->setStatus(404);
+			$app->stop();
+		} else {
+			$app->response->setBody(json_encode($response));
+		}
 	});
 
 	/**

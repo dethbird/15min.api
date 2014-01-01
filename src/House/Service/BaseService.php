@@ -16,4 +16,12 @@ class BaseService
     public function prepareResponse(ServiceResponse $response = null){
     	return is_null($response) ? json_encode($this->response) : json_encode($response);
     }
+
+    public function resultsToArray($items){
+    	$response = array();
+    	foreach($items as $item){
+    		$response[] = $item->to_array();
+    	}
+    	return $response;
+    }
 }

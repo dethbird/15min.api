@@ -4,9 +4,7 @@ require_once("House/Service/BaseService.php");
 
 class UserService extends BaseService
 {
-	public function __construct(){
-		parent::__construct();
-	}
+	
     public function findByApiKey($key)
     {
     	$users = User::find('all', array('conditions' => array('api_key = ?', $key)));
