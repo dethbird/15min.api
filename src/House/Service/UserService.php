@@ -16,4 +16,16 @@ class UserService extends BaseService
     	}
     	return $this->response;
     }
+
+    public function auth($email, $password)
+    {
+        $users = User::find('all', array('conditions' => array('email = ? AND password = MD5(?)', $email, $password)));
+
+        if(count($users)<1){
+            $this->response->addError("user.auth.invalid_user", "Invalid email / password");
+        } else {
+            $this->response->setData($users[0]->to_array());
+        }
+        return $this->response;
+    }    
 }

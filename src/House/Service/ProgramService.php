@@ -4,10 +4,27 @@ require_once("House/Service/BaseService.php");
 
 class ProgramService extends BaseService
 {
+
+    /**
+    * Find the content that should be playing right now
+    */
+    public function nowPlaying()
+    {
+
+        $programs = Program::find_by_sql('SELECT * FROM `programs` WHERE timeslot < '. time() .' LIMIT 1');
+
+        if(count($programs)<1){
+            $this->response->addError("programs.find.no_results");
+        } else {
+            $this->response->setData($this->resultsToArray($programs));
+        }
+        return $this->response;
+    }
 	
     public function find($criteria)
     {
-    	$programs = Program::find('all');
+
+    	$programs = Program::find('all', array('order' => 'timeslot asc'));
 
     	if(count($programs)<1){
     		$this->response->addError("programs.find.no_results");

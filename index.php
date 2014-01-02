@@ -72,10 +72,12 @@
 		return function () use ( $app ) 
 		{
 			global $user;
+
 			
 			$request = $app->request;
+
 			$service = new UserService();
-			$response = $service->findByApiKey($request->get('api_key'));
+			$response = $service->findByApiKey($request->params('api_key'));
 
 			if(!$response->isOk()){
 				
@@ -91,30 +93,63 @@
 
 	$app->get('/hello/:name',  $authenticate($app), function ($name) {
 		global $user;
-    	echo "Hello, $name";
-    	print_r($user);
+    	var_dump($user);
+	});
+
+	$app->post('/auth/', $authenticate($app), function () {
+		global $app;
+		
+		$request = $app->request;
+
+		$service = new UserService();
+		
+		$response = $service->auth($request->params('email'), $request->params('password'));
+		$app->response->setBody(json_encode($response));
+
+		if(!$response->isOk()){
+			$app->response->setStatus(404);
+			$app->stop();
+		} 
+	});
+
+
+	$app->get('/nowplaying/',  $authenticate($app), function () {
+		global $app;
+		
+		$request = $app->request;
+		$service = new ProgramService();
+		
+		$response = $service->nowPlaying();
+		$app->response->setBody(json_encode($response));
+
+		if(!$response->isOk()){
+			$app->response->setStatus(404);
+			$app->stop();
+		}
 	});
 
 	/**
-	* Get all programs from now or timestamp
+	* Get all programs from now or timeslot
 	* 
-	* @param $timestamp (optional) (default = now)
+	* @param $timeslot (optional) (default = now) unix timestamp
 	* @return array //collection of programs
 	*/
-	$app->get('/programs/',  $authenticate($app), function ($timestamp = null) {
+	$app->get('/programs/',  $authenticate($app), function () {
 		global $app;
+		
+		$request = $app->request;
 		$service = new ProgramService();
+		
+		//build criteria
 		$criteria = array();
-		if(!is_null($timestamp)){
-			$criteria['timestamp'] = $timestamp;
-		}
+		$criteria['timeslot'] = is_null($request->get('timeslot')) ? time() : $request->get('timeslot');
+		
 		$response = $service->find($criteria);
-
-    	if(!$response->isOk()){
+		$app->response->setBody(json_encode($response));
+		
+		if(!$response->isOk()){
 			$app->response->setStatus(404);
 			$app->stop();
-		} else {
-			$app->response->setBody(json_encode($response));
 		}
 	});
 
