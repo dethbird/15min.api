@@ -21,10 +21,20 @@ class ProgramService extends BaseService
         return $this->response;
     }
 	
-    public function find($criteria)
+    public function find($criteria = array())
     {
 
-    	$programs = Program::find('all', array('order' => 'timeslot asc'));
+        $conditionString = "1 = 1";
+        $conditionBindings = array();
+        if(isset($criteria['id'])){
+            $conditionString .= " AND id = ?";
+            $conditionBindings[] = $criteria['id'];
+        }
+
+    	$programs = Program::find('all', array(
+            'order' => 'timeslot asc',
+            'conditions' => array_merge(array($conditionString), $conditionBindings)
+        ));
 
     	if(count($programs)<1){
     		$this->response->addError("programs.find.no_results");

@@ -146,6 +146,25 @@
 		
 		$response = $service->find($criteria);
 		$app->response->setBody(json_encode($response));
+
+		if(!$response->isOk()){
+			$app->response->setStatus(404);
+			$app->stop();
+		}
+	});
+
+	$app->get('/programs/:id/',  $authenticate($app), function ($id) {
+		global $app;
+		
+		$request = $app->request;
+		$service = new ProgramService();
+		
+		//build criteria
+		$criteria = array();
+		$criteria['id'] = $id;
+		
+		$response = $service->find($criteria);
+		$app->response->setBody(json_encode($response));
 		
 		if(!$response->isOk()){
 			$app->response->setStatus(404);
