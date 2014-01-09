@@ -47,7 +47,7 @@ class ProgramService extends BaseService
     public function create($params)
     {
         $params['id'] = null;
-        $params['uuid'] = base64_encode(uniqid('', true));
+        $params['uuid'] = $this->gen_uuid();
     
         return Program::create($params);
     }
@@ -58,7 +58,7 @@ class ProgramService extends BaseService
         unset($params['$$hashKey']);
         $program = Program::find($params['id']);
         if(!$program->uuid){
-            $params['uuid'] = base64_encode(uniqid('', true));
+            $params['uuid'] = $this->gen_uuid();
         }
         $program->update_attributes($params);
         return $program;
