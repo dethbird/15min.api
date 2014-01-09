@@ -46,9 +46,9 @@ class ProgramService extends BaseService
 
     public function create($params)
     {
-        unset($params['api_key']);
-        unset($params['$$hashKey']);
-        unset($params['id']);
+        $params['id'] = null;
+        $params['uuid'] = base64_encode(uniqid('', true));
+    
         return Program::create($params);
     }
 
@@ -57,6 +57,9 @@ class ProgramService extends BaseService
         unset($params['api_key']);
         unset($params['$$hashKey']);
         $program = Program::find($params['id']);
+        if(!$program->uuid){
+            $params['uuid'] = base64_encode(uniqid('', true));
+        }
         $program->update_attributes($params);
         return $program;
     }
