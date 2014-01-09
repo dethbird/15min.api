@@ -13,9 +13,7 @@ class Base extends ActiveRecord\Model {
             $this->date_added = date("F j, Y, g:i a"); 
         }
         $this->date_updated = date("F j, Y, g:i a");
-        if($this->publish_json!=""){
-        	$this->publish_date = date("F j, Y, g:i a");
-        }
+        
     }
 }
 

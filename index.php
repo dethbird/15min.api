@@ -41,6 +41,8 @@
 	$app = new \Slim\Slim();
 	$app->response->headers->set('Content-Type', 'application/json'); //default response type
 	$app->response->headers->set("Access-Control-Allow-Origin", "*"); // CORS
+	$app->response->headers->set("Access-Control-Allow-Methods", "*");
+	$app->response->headers->set("Access-Control-Allow-Headers", "*");
 
 
 	/**
@@ -171,6 +173,27 @@
 			$app->stop();
 		}
 	});
+
+
+	/** UPDATE **/
+	$app->post('/programs/',  $authenticate($app), function () {
+		global $app;
+		
+		$request = $app->request;
+		$service = new ProgramService();
+
+		
+		
+		if ($request->params('id')==='new' ||  $request->params('id')==""){
+			$service->create($request->params());
+		} else {
+			$service->update($request->params());
+		}
+
+	});
+
+	
+
 
 	/**
 	* __________            ._._._.

@@ -43,4 +43,23 @@ class ProgramService extends BaseService
     	}
     	return $this->response;
     }
+
+    public function create($params)
+    {
+        unset($params['api_key']);
+        unset($params['$$hashKey']);
+        unset($params['id']);
+        return Program::create($params);
+    }
+
+    public function update($params)
+    {
+        unset($params['api_key']);
+        unset($params['$$hashKey']);
+        $program = Program::find($params['id']);
+        $program->update_attributes($params);
+        return $program;
+    }
+
+
 }
