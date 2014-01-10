@@ -11,7 +11,7 @@ class ProgramService extends BaseService
     public function nowPlaying()
     {
 
-        $programs = Program::find_by_sql('SELECT * FROM `programs` WHERE timeslot < '. time() .' LIMIT 1');
+        $programs = Program::find_by_sql('SELECT * FROM `programs` WHERE timeslot < UNIX_TIMESTAMP(NOW()) ORDER BY timeslot DESC LIMIT 1');
 
         if(count($programs)<1){
             $this->response->addError("programs.find.no_results");
