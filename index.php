@@ -130,6 +130,20 @@
 		}
 	});
 
+	$app->get('/playnow/:uuid/',  $authenticate($app), function ($uuid) {
+		global $app;
+		
+		$request = $app->request;
+		$service = new ProgramService();
+		
+		$response = $service->playNow($uuid);
+		$app->response->setBody(json_encode($response));
+
+		if(!$response->isOk()){
+			$app->halt(404, json_encode($response));
+		}
+	});
+
 	/**
 	* Get all programs from now or timeslot
 	* 
@@ -150,8 +164,7 @@
 		$app->response->setBody(json_encode($response));
 
 		if(!$response->isOk()){
-			$app->response->setStatus(404);
-			$app->stop();
+			$app->halt(404, json_encode($response));
 		}
 	});
 
@@ -169,28 +182,28 @@
 		$app->response->setBody(json_encode($response));
 		
 		if(!$response->isOk()){
-			$app->response->setStatus(404);
-			$app->stop();
+			$app->halt(404, json_encode($response));
 		}
 	});
 
 
-	/** UPDATE **/
 	$app->post('/programs/',  $authenticate($app), function () {
 		global $app;
+		global $user;
 		
 		$request = $app->request;
 		$service = new ProgramService();
-
-		
 		
 		if ($request->params('id')==='new' ||  $request->params('id')==""){
-			$service->create($request->params());
+
+			$service->create(array_merge($request->params(), array("user_id"=>$user['id'])));
 		} else {
 			$service->update($request->params());
 		}
 
 	});
+
+
 
 	
 

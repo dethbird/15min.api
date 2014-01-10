@@ -21,14 +21,20 @@ class ServiceResponse
     public $errors;
 
     /**
+     * @var array
+     */
+    public $status;
+
+    /**
      * Constructor
      *
      */
     public function __construct()
     {
-        //$this->data     = array();
-        //$this->metadata = array();
-        //$this->errors   = array();
+        $this->data     = array();
+        $this->metadata = array();
+        $this->errors   = array();
+        $this->status   = true;
     }
 
     /**
@@ -152,6 +158,7 @@ class ServiceResponse
     public function addError($error, $message = '')
     {
         $this->errors[$error] = $message;
+        $this->status = false;
     }
 
     /**
